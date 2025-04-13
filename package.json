@@ -4,7 +4,7 @@
   "description": "Soulstone House Bazi Crystal Matching Server",
   "main": "backend-crystal-ai.js",
   "scripts": {
-    "start": "node backend-crystal-ai.js"
+    "start": "node api/backend-crystal-ai.js"
   },
   "dependencies": {
     "express": "^4.18.2",

@@ -1,44 +1,43 @@
+import { Configuration, OpenAIApi } from "openai";
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
-const app = express();
-require('dotenv').config();
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST requests allowed" });
+  }
 
-app.use(bodyParser.json());
-
-app.post('/', async (req, res) => {
   const { birthday, birthtime, language } = req.body;
 
-  const prompt = `
-You are a master of crystal energy. Based on the birth date ${birthday} and birth time ${birthtime}, recommend the best crystals for good fortune. Reply in ${language === 'zh' ? 'Chinese' : 'English'}.
-`;
+  if (!birthday || !birthtime || !language) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'OpenAI-Organization': 'org-yae8SFcVGBZYvoJjNF7cD74z'
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }]
-      })
+    const configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const openai = new OpenAIApi(configuration);
+
+    const prompt = `
+You are an expert in Bazi (Chinese Astrology) and Crystal Matching. 
+Based on the birth date "${birthday}", birth time "${birthtime}", and language "${language}", 
+analyze the user's Five Elements (Metal, Wood, Water, Fire, Earth) and recommend 3 crystals that will bring balance and luck. 
+Output only the crystal names, and a very short explanation in "${language}".
+`;
+
+    const response = await openai.createChatCompletion({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "You are a professional crystal matching AI." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
     });
 
-    const data = await response.json();
-    const result = data.choices?.[0]?.message?.content;
-
-    res.status(200).json({ result });
+    const message = response.data.choices[0].message.content;
+    res.status(200).json({ result: message });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Something went wrong.' });
+    console.error(error.response ? error.response.data : error.message);
+    res.status(500).json({ error: "Something went wrong" });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+}

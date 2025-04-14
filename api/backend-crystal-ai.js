@@ -1,3 +1,5 @@
+// backend-crystal-ai.js
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -5,42 +7,34 @@ export default async function handler(req, res) {
 
   const { birthday, birthtime, language } = req.body;
 
-  const prompt = `
-You are a professional crystal energy advisor.
-Based on the following birthday: ${birthday}, birth time: ${birthtime}, and language: ${language}, 
-please recommend the most suitable crystals.
+  if (!birthday || !birthtime || !language) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
 
-If the language is Chinese, reply in Chinese.
-If the language is English, reply in English.
-
-Do not explain, just list the crystal names and reasons.
-  `;
-
+  // 读取 OpenAI 的 API Key，自动从环境变量里取
   const apiKey = process.env.OPENAI_API_KEY;
-  const endpoint = "https://api.openai.com/v1/chat/completions";
 
   try {
-    const completion = await fetch(endpoint, {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: 'gpt-3.5-turbo',
         messages: [
-          { role: "system", content: "You are a crystal energy expert." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.7
+          { role: 'system', content: '你是一个根据出生日期与时间推荐水晶的智能顾问。' },
+          { role: 'user', content: `生日：${birthday} 时间：${birthtime} 语言：${language}。请推荐适合的水晶。` }
+        ]
       })
     });
 
-    const data = await completion.json();
-    const reply = data.choices?.[0]?.message?.content || "Sorry, no response.";
-    res.status(200).json({ reply });
+    const data = await response.json();
+
+    res.status(200).json({ reply: data.choices[0].message.content });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }

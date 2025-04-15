@@ -1,8 +1,4 @@
-import express from 'express';
-import cors from 'cors';
 import { Configuration, OpenAIApi } from 'openai';
-import dotenv from 'dotenv';
-dotenv.config();
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

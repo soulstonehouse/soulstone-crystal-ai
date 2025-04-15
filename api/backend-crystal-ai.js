@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai';
+const { OpenAIApi, Configuration } = require('openai');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

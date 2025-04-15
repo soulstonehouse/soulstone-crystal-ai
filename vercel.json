@@ -1,9 +1,9 @@
 {
   "version": 2,
+  "builds": [
+    { "src": "api/backend-crystal-ai.js", "use": "@vercel/node" }
+  ],
   "routes": [
-    {
-      "src": "/api/backend-crystal-ai",
-      "dest": "/api/backend-crystal-ai.js"
-    }
+    { "src": "/api/(.*)", "dest": "api/backend-crystal-ai.js" }
   ]
 }

@@ -1,4 +1,4 @@
-import { OpenAIApi, Configuration } from 'openai';
+import { OpenAIApi } from 'openai';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';

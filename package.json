@@ -1,8 +1,8 @@
 {
   "name": "soulstone-crystal-ai",
-  "type": "module",  // 明确声明使用 ESM
+  "type": "module",
   "engines": {
-    "node": ">=18"   // 指定 Node.js 版本
+    "node": ">=18"
   },
   "scripts": {
     "start": "node api/backend-crystal-ai.js"

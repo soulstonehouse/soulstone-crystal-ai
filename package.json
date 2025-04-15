@@ -1,8 +1,9 @@
 {
   "name": "soulstone-crystal-ai",
-  "version": "1.0.0",
-  "description": "Soulstone House Bazi Crystal Matching Server",
-  "main": "backend-crystal-ai.js",
+  "type": "module",  // 明确声明使用 ESM
+  "engines": {
+    "node": ">=18"   // 指定 Node.js 版本
+  },
   "scripts": {
     "start": "node api/backend-crystal-ai.js"
   },
